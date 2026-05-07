@@ -264,7 +264,7 @@ ORDER BY peak_hour_flag DESC, avg_delay DESC;
 """
     with open(os.path.join(SQL_DIR, "analysis_queries.sql"), "w") as f:
         f.write(sql_content)
-    print(f"\n  ✓ Exported SQL queries to sql/analysis_queries.sql")
+    print(f"\n  [v] Exported SQL queries to sql/analysis_queries.sql")
 
 
 def main():
