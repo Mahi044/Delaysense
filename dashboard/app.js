@@ -40,7 +40,7 @@ function applyChartDefaults() {
 
 // ── Toast Notifications ──
 function showToast(msg, type = 'info', duration = 3500) {
-    const icon = { success: '✅', error: '❌', info: 'ℹ️' }[type] || 'ℹ️';
+    const icon = { success: 'OK', error: 'ERR', info: 'INFO' }[type] || 'INFO';
     const ct = document.getElementById('toastContainer');
     const t = document.createElement('div');
     t.className = `toast ${type}`;
@@ -175,14 +175,17 @@ function renderTraffic(rows) {
 function renderPeak(rows) {
     destroy('peak');
     const g=group(rows,'time_of_day'), order=['Morning','Afternoon','Evening','Night'], labels=order.filter(l=>g[l]);
+    const ratingVals = labels.map(l=>+avgOf(g[l],'rating').toFixed(2));
+    const minRating = Math.max(0, Math.floor((Math.min(...ratingVals) - 0.15) * 10) / 10);
+    const maxRating = Math.min(5.5, Math.ceil((Math.max(...ratingVals) + 0.15) * 10) / 10);
     charts.peak = new Chart(document.getElementById('peakChart'),{
         type:'bar',
         data:{labels,datasets:[
             {label:'Avg Delay',data:labels.map(l=>+avgOf(g[l],'delivery_delay').toFixed(1)),backgroundColor:C.amber(0.6),borderRadius:8,barPercentage:0.5},
-            {label:'Rating',data:labels.map(l=>+avgOf(g[l],'rating').toFixed(2)),backgroundColor:C.teal(0.5),borderRadius:8,barPercentage:0.5,yAxisID:'y1'}
+            {label:'Rating',data:ratingVals,backgroundColor:C.teal(0.5),borderRadius:8,barPercentage:0.5,yAxisID:'y1'}
         ]},
         options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:getTooltip()},
-            scales:{x:{grid:{display:false},border:getBorder()},y:{title:{display:true,text:'Delay (min)',color:getTextColor()},grid:getGrid(),border:getBorder()},y1:{position:'right',title:{display:true,text:'Rating',color:getTextColor()},grid:{display:false},border:getBorder(),min:0,max:5.5}}}
+            scales:{x:{grid:{display:false},border:getBorder()},y:{title:{display:true,text:'Delay (min)',color:getTextColor()},grid:getGrid(),border:getBorder()},y1:{position:'right',title:{display:true,text:'Rating',color:getTextColor()},grid:{display:false},border:getBorder(),min:minRating,max:maxRating}}}
     });
 }
 
@@ -279,7 +282,7 @@ function renderMapMarkers(rows) {
             weight: 1, opacity: 0.8, fillOpacity: 0.5,
         }).addTo(leafletMap);
 
-        marker.bindPopup(`<strong>${r.restaurant_name || 'Restaurant'}</strong><br>Delay: ${(r.delivery_delay||0).toFixed(1)} min<br>Rating: ${r.rating}⭐<br>${r.delay_category}`);
+        marker.bindPopup(`<strong>${r.restaurant_name || 'Restaurant'}</strong><br>Delay: ${(r.delivery_delay||0).toFixed(1)} min<br>Rating: ${r.rating}<br>${r.delay_category}`);
         leafletMarkers.push(marker);
     });
 }

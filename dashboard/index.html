@@ -87,12 +87,12 @@
         <!-- OVERVIEW -->
         <main class="content page-content active" id="page-overview">
             <section class="kpi-row">
-                <div class="kpi" data-accent="red"><div class="kpi-top"><span class="kpi-label">Total Orders</span><span class="kpi-badge">📦</span></div><div class="kpi-val" id="kpiOrders">—</div><div class="kpi-sub" id="kpiOrdersSub">entire dataset</div></div>
-                <div class="kpi" data-accent="amber"><div class="kpi-top"><span class="kpi-label">Avg Rating</span><span class="kpi-badge">⭐</span></div><div class="kpi-val" id="kpiRating">—</div><div class="kpi-sub">out of 5.0</div></div>
-                <div class="kpi" data-accent="green"><div class="kpi-top"><span class="kpi-label">Avg Delay</span><span class="kpi-badge">⏱</span></div><div class="kpi-val" id="kpiDelay">—</div><div class="kpi-sub" id="kpiDelaySub"></div></div>
-                <div class="kpi" data-accent="blue"><div class="kpi-top"><span class="kpi-label">On-Time Rate</span><span class="kpi-badge">✅</span></div><div class="kpi-val" id="kpiOnTime">—</div><div class="kpi-sub">of all orders</div></div>
-                <div class="kpi" data-accent="purple"><div class="kpi-top"><span class="kpi-label">Avg Delivery</span><span class="kpi-badge">🚗</span></div><div class="kpi-val" id="kpiDelivery">—</div><div class="kpi-sub">minutes per order</div></div>
-                <div class="kpi" data-accent="teal"><div class="kpi-top"><span class="kpi-label">Avg Cost</span><span class="kpi-badge">💰</span></div><div class="kpi-val" id="kpiCost">—</div><div class="kpi-sub">per order</div></div>
+                <div class="kpi" data-accent="red"><div class="kpi-top"><span class="kpi-label">Total Orders</span><span class="kpi-badge">ORD</span></div><div class="kpi-val" id="kpiOrders">—</div><div class="kpi-sub" id="kpiOrdersSub">entire dataset</div></div>
+                <div class="kpi" data-accent="amber"><div class="kpi-top"><span class="kpi-label">Avg Rating</span><span class="kpi-badge">RT</span></div><div class="kpi-val" id="kpiRating">—</div><div class="kpi-sub">out of 5.0</div></div>
+                <div class="kpi" data-accent="green"><div class="kpi-top"><span class="kpi-label">Avg Delay</span><span class="kpi-badge">DL</span></div><div class="kpi-val" id="kpiDelay">—</div><div class="kpi-sub" id="kpiDelaySub"></div></div>
+                <div class="kpi" data-accent="blue"><div class="kpi-top"><span class="kpi-label">On-Time Rate</span><span class="kpi-badge">OT</span></div><div class="kpi-val" id="kpiOnTime">—</div><div class="kpi-sub">of all orders</div></div>
+                <div class="kpi" data-accent="purple"><div class="kpi-top"><span class="kpi-label">Avg Delivery</span><span class="kpi-badge">TM</span></div><div class="kpi-val" id="kpiDelivery">—</div><div class="kpi-sub">minutes per order</div></div>
+                <div class="kpi" data-accent="teal"><div class="kpi-top"><span class="kpi-label">Avg Cost</span><span class="kpi-badge">INR</span></div><div class="kpi-val" id="kpiCost">—</div><div class="kpi-sub">per order</div></div>
             </section>
             <section class="grid-2-1">
                 <div class="card"><div class="card-header"><h2>Delivery Delay vs Rating</h2><p>How delays affect customer satisfaction</p></div><div class="card-chart"><canvas id="delayRatingChart"></canvas></div></div>
@@ -125,7 +125,7 @@
         <main class="content page-content" id="page-heatmap">
             <section class="grid-full">
                 <div class="card card--map">
-                    <div class="card-header"><h2>🗺️ Delivery Heatmap</h2><p>Simulated delivery zone coverage (Bangalore area)</p></div>
+                    <div class="card-header"><h2>Delivery Heatmap</h2><p>Simulated delivery zone coverage (Bangalore area)</p></div>
                     <div id="leafletMap" style="height:520px;border-radius:0 0 14px 14px;"></div>
                 </div>
             </section>
@@ -140,7 +140,7 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <script src="data.js?v=6"></script>
-    <script src="app.js?v=6"></script>
+    <script src="data.js?v=7"></script>
+    <script src="app.js?v=7"></script>
 </body>
 </html>
