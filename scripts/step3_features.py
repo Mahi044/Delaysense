@@ -60,16 +60,6 @@ def synthesize_logistics(df):
     # 6. Delivery Delay
     df["delivery_delay"] = df["total_time"] - df["expected_time"]
     
-    # Correlate lower Swiggy rating with higher delay!
-    # To make the ML model accurate and charts realistic:
-    # If the Swiggy rating is low (<3.5), artificially increase the delay.
-    mask_low_rating = df["rating"] < 3.5
-    df.loc[mask_low_rating, "delivery_delay"] += np.random.randint(5, 20, mask_low_rating.sum())
-    
-    # Update total_time to reflect this synthetic adjustment so math checks out
-    df.loc[mask_low_rating, "total_time"] = df.loc[mask_low_rating, "expected_time"] + df.loc[mask_low_rating, "delivery_delay"]
-    df.loc[mask_low_rating, "delivery_time"] = df.loc[mask_low_rating, "total_time"] - df.loc[mask_low_rating, "food_preparation_time"]
-    
     # 7. Delay Category
     def categorize_delay(d):
         if d < -5: return "Early"
@@ -85,7 +75,16 @@ def synthesize_logistics(df):
     df["peak_hour_flag"] = df["order_hour"].apply(lambda x: 1 if x in [13, 14, 19, 20, 21] else 0)
     df["day_of_the_week"] = np.random.choice(["Weekday", "Weekend"], n, p=[0.7, 0.3])
     
-    # 9. Sentiment (Based on rating)
+    # 9. Recompute rating so delivery experience can affect satisfaction.
+    # Keep original source rating as a baseline restaurant quality signal.
+    df["base_rating"] = df["rating"]
+    delay_penalty = np.where(df["delivery_delay"] > 0, df["delivery_delay"] * 0.02, 0.0)
+    traffic_penalty = df["traffic_level"].map({"Low": 0.0, "Medium": 0.03, "High": 0.08, "Jam": 0.12})
+    prep_penalty = np.where(df["food_preparation_time"] > 30, (df["food_preparation_time"] - 30) * 0.015, 0.0)
+    noise = np.random.normal(0, 0.12, n)
+    df["rating"] = (df["base_rating"] - delay_penalty - traffic_penalty - prep_penalty + noise).clip(1.0, 5.0).round(1)
+
+    # 10. Sentiment (Based on rating)
     df["sentiment_score"] = (df["rating"] - 1) / 4.0 # Map 1-5 to 0-1
     df["sentiment"] = df["rating"].apply(lambda x: "Positive" if x >= 4.0 else ("Neutral" if x >= 3.0 else "Negative"))
 

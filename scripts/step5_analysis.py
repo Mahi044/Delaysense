@@ -33,7 +33,7 @@ def load_into_sqlite():
             df.to_sql(table_name, conn, index=False, if_exists="replace")
             print(f"  Loaded {table_name}: {len(df)} rows")
         else:
-            print(f"  ⚠ Missing: {filepath}")
+            print(f"  [!] Missing: {filepath}")
 
     return conn
 
@@ -168,13 +168,13 @@ def run_analysis(conn):
                 corr = corr_df["delivery_delay"].corr(corr_df["rating"])
                 print(f"\n  > Pearson Correlation (delay vs rating): {corr:.4f}")
                 if abs(corr) < 0.1:
-                    print("     → Weak/No linear correlation")
+                    print("     -> Weak/No linear correlation")
                 elif abs(corr) < 0.3:
-                    print("     → Weak negative correlation")
+                    print("     -> Weak negative correlation")
                 elif abs(corr) < 0.5:
-                    print("     → Moderate negative correlation")
+                    print("     -> Moderate negative correlation")
                 else:
-                    print("     → Strong negative correlation")
+                    print("     -> Strong negative correlation")
 
         except Exception as e:
             print(f"  [x] Error: {e}")
@@ -264,7 +264,7 @@ ORDER BY peak_hour_flag DESC, avg_delay DESC;
 """
     with open(os.path.join(SQL_DIR, "analysis_queries.sql"), "w") as f:
         f.write(sql_content)
-    print(f"\n  [v] Exported SQL queries to sql/analysis_queries.sql")
+    print(f"\n  [OK] Exported SQL queries to sql/analysis_queries.sql")
 
 
 def main():

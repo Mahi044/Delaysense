@@ -45,7 +45,7 @@ def build_star_schema():
     # =========================================================================
     fact_orders = df[[
         "order_id", "customer_id", "restaurant_id",
-        "cost", "rating", "food_preparation_time", "delivery_time",
+        "cost", "base_rating", "rating", "food_preparation_time", "delivery_time",
         "total_time", "delivery_delay", "distance_km",
         "order_hour", "time_of_day", "peak_hour_flag",
         "traffic_level", "delay_category", "day_of_the_week",
