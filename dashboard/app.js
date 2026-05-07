@@ -70,7 +70,7 @@ function populateFilters() {
     };
     add('cuisineFilter', RAW_DATA.cuisines);
     add('dayFilter', RAW_DATA.days);
-    add('restaurantFilter', RAW_DATA.restaurants.slice(0, 30));
+    add('restaurantFilter', RAW_DATA.restaurants);
 }
 
 // ================================================================
