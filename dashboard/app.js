@@ -240,153 +240,7 @@ function renderCuisineChart(rows) {
     });
 }
 
-// ================================================================
-//  SENTIMENT CHARTS
-// ================================================================
-function renderSentiment(rows) {
-    const hasS = rows.some(r=>r.sentiment!=null);
-    if (!hasS) return;
-    destroy('sentiment');
-    const g=group(rows,'sentiment');
-    const labels=['Positive','Neutral','Negative'], values=labels.map(l=>(g[l]||[]).length);
-    charts.sentiment = new Chart(document.getElementById('sentimentChart'),{
-        type:'doughnut',
-        data:{labels,datasets:[{data:values,backgroundColor:[C.green(0.8),C.amber(0.85),C.red(0.75)],borderColor:isDark()?'rgba(24,27,37,1)':'#fff',borderWidth:3,hoverOffset:8}]},
-        options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom'},tooltip:getTooltip()}}
-    });
-    destroy('sentimentDelay');
-    const dg=group(rows.filter(r=>r.sentiment_score!=null),'delay_category');
-    const dl=['Early','On Time','Slightly Delayed','Heavily Delayed'].filter(l=>dg[l]);
-    const scores=dl.map(l=>+avgOf(dg[l],'sentiment_score').toFixed(3));
-    const barC=scores.map(s=>s>=0?C.green(0.65):C.red(0.65));
-    charts.sentimentDelay = new Chart(document.getElementById('sentimentDelayChart'),{
-        type:'bar',
-        data:{labels:dl,datasets:[{label:'Sentiment Score',data:scores,backgroundColor:barC,borderRadius:8,barPercentage:0.5}]},
-        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:getTooltip()},
-            scales:{x:{grid:{display:false},border:getBorder()},y:{title:{display:true,text:'Sentiment Score',color:getTextColor()},grid:getGrid(),border:getBorder()}}}
-    });
-}
 
-// ================================================================
-//  ML PREDICTION ENGINE
-// ================================================================
-function setupPrediction() {
-    // Live slider value updates
-    const sliders = [
-        { id: 'predDist', valId: 'predDistVal', fmt: v => `${parseFloat(v).toFixed(1)} km` },
-        { id: 'predPrep', valId: 'predPrepVal', fmt: v => `${v} min` },
-        { id: 'predHour', valId: 'predHourVal', fmt: v => { const h = parseInt(v); return h > 12 ? `${h-12}:00 PM` : h === 12 ? '12:00 PM' : `${h}:00 AM`; } },
-        { id: 'predCost', valId: 'predCostVal', fmt: v => `₹${v}` },
-    ];
-    sliders.forEach(s => {
-        const el = document.getElementById(s.id);
-        const val = document.getElementById(s.valId);
-        if (el && val) {
-            el.addEventListener('input', () => { val.textContent = s.fmt(el.value); });
-            val.textContent = s.fmt(el.value);
-        }
-    });
-
-    document.getElementById('runPredict')?.addEventListener('click', runPrediction);
-
-    // Show model metadata
-    if (typeof ML_DATA !== 'undefined') {
-        const meta = document.getElementById('modelMeta');
-        if (meta) {
-            meta.innerHTML = `<div class="model-meta-row">
-                <span class="model-meta-item"><strong>R²:</strong> ${ML_DATA.model.r2}</span>
-                <span class="model-meta-item"><strong>RMSE:</strong> ${ML_DATA.model.rmse} min</span>
-                <span class="model-meta-item"><strong>MAE:</strong> ${ML_DATA.model.mae} min</span>
-                <span class="model-meta-item"><strong>Features:</strong> ${ML_DATA.model.feature_order.length}</span>
-            </div>`;
-        }
-    }
-}
-
-function runPrediction() {
-    if (typeof ML_DATA === 'undefined') { showToast('ML data not loaded', 'error'); return; }
-
-    const coeffs = ML_DATA.model.coefficients;
-    const trafficMap = { Low: 0, Medium: 1, High: 2, Jam: 3 };
-    const todMap = { Morning: 0, Afternoon: 1, Evening: 2, Night: 3 };
-
-    const dist = parseFloat(document.getElementById('predDist').value);
-    const prep = parseFloat(document.getElementById('predPrep').value);
-    const hour = parseInt(document.getElementById('predHour').value);
-    const peak = (hour >= 11 && hour <= 14) || (hour >= 18 && hour <= 21) ? 1 : 0;
-    const cost = parseFloat(document.getElementById('predCost').value);
-    const traffic = trafficMap[document.getElementById('predTraffic').value];
-    const tod = todMap[document.getElementById('predTod').value];
-
-    // Apply linear model: sum(coeff * feature) + intercept
-    const features = [dist, prep, hour, peak, cost, traffic, tod];
-    const featureNames = ML_DATA.model.feature_order;
-    let prediction = coeffs.intercept || 0;
-    featureNames.forEach((name, i) => {
-        prediction += (coeffs[name] || 0) * features[i];
-    });
-    prediction = Math.round(prediction * 10) / 10;
-
-    // Determine category
-    let cat, catClass, catLabel;
-    if (prediction <= -5) { cat = 'Early'; catClass = 'early'; catLabel = '🟢 Early Delivery'; }
-    else if (prediction <= 5) { cat = 'On Time'; catClass = 'ontime'; catLabel = '🔵 On Time'; }
-    else if (prediction <= 15) { cat = 'Slightly Delayed'; catClass = 'slight'; catLabel = '🟡 Slightly Delayed'; }
-    else { cat = 'Heavily Delayed'; catClass = 'heavy'; catLabel = '🔴 Heavily Delayed'; }
-
-    // Estimate rating
-    const estRating = Math.max(1, Math.min(5, 4.6 - prediction * 0.04)).toFixed(2);
-
-    const el = document.getElementById('predictResult');
-    el.innerHTML = `
-        <div class="pr-value ${prediction <= 0 ? 'positive' : 'negative'}">${prediction > 0 ? '+' : ''}${prediction.toFixed(1)} min</div>
-        <div class="pr-label">Predicted Delivery Delay</div>
-        <span class="pr-category ${catClass}">${catLabel}</span>
-        <div class="pr-details">
-            <div class="pr-detail"><div class="pr-detail-val">⭐ ${estRating}</div><div class="pr-detail-label">Est. Rating</div></div>
-            <div class="pr-detail"><div class="pr-detail-val">${dist.toFixed(1)} km</div><div class="pr-detail-label">Distance</div></div>
-            <div class="pr-detail"><div class="pr-detail-val">${peak ? 'Yes' : 'No'}</div><div class="pr-detail-label">Peak Hour</div></div>
-            <div class="pr-detail"><div class="pr-detail-val">${document.getElementById('predTraffic').value}</div><div class="pr-detail-label">Traffic</div></div>
-        </div>
-    `;
-    showToast(`Prediction: ${prediction.toFixed(1)} min delay (${cat})`, prediction <= 5 ? 'success' : 'error');
-}
-
-// ================================================================
-//  CORRELATION MATRIX
-// ================================================================
-function renderCorrelationMatrix() {
-    if (typeof ML_DATA === 'undefined' || !ML_DATA.correlations) return;
-    destroy('corr');
-    const cols = ML_DATA.correlations.columns;
-    const matrix = ML_DATA.correlations.matrix;
-    // Build heatmap-style data
-    const data = [];
-    for (let i = 0; i < cols.length; i++) {
-        for (let j = 0; j < cols.length; j++) {
-            data.push({ x: cols[j], y: cols[i], v: matrix[i][j] });
-        }
-    }
-    // Use bubble chart as heatmap approximation
-    charts.corr = new Chart(document.getElementById('corrChart'), {
-        type: 'bubble',
-        data: {
-            datasets: data.map(d => ({
-                label: `${d.y}↔${d.x}`,
-                data: [{ x: cols.indexOf(d.x), y: cols.indexOf(d.y), r: Math.abs(d.v) * 18 }],
-                backgroundColor: d.v >= 0 ? C.green(Math.abs(d.v) * 0.7 + 0.1) : C.red(Math.abs(d.v) * 0.7 + 0.1),
-            }))
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { ...getTooltip(), callbacks: { label: ctx => { const d = data[ctx.datasetIndex]; return `${d.y} ↔ ${d.x}: ${d.v.toFixed(3)}`; } } } },
-            scales: {
-                x: { type: 'linear', min: -0.5, max: cols.length - 0.5, ticks: { callback: v => cols[v] || '', stepSize: 1, maxRotation: 45 }, grid: getGrid(), border: getBorder() },
-                y: { type: 'linear', min: -0.5, max: cols.length - 0.5, ticks: { callback: v => cols[v] || '', stepSize: 1 }, grid: getGrid(), border: getBorder() }
-            }
-        }
-    });
-}
 
 // ================================================================
 //  LEAFLET HEATMAP
@@ -471,88 +325,7 @@ function renderDistDelay(rows) {
     });
 }
 
-// ================================================================
-//  INSIGHTS
-// ================================================================
-function renderInsights() {
-    if (typeof ML_DATA === 'undefined' || !ML_DATA.insights) return;
-    const grid = document.getElementById('insightsGrid');
-    if (!grid) return;
-    grid.innerHTML = ML_DATA.insights.map((ins, i) =>
-        `<div class="insight-card ${ins.type}" style="animation-delay:${i*0.08}s">
-            <div class="insight-icon">${ins.icon}</div>
-            <div class="insight-body">
-                <div class="insight-title">${ins.title}</div>
-                <div class="insight-text">${ins.text}</div>
-            </div>
-        </div>`
-    ).join('');
-}
 
-function renderCuisineDelayChart() {
-    if (typeof ML_DATA === 'undefined' || !ML_DATA.cuisine_delays) return;
-    destroy('cuisineDelay');
-    const entries = Object.entries(ML_DATA.cuisine_delays)
-        .filter(e => e[0].length < 35) // skip excessively long names
-        .sort((a, b) => b[1] - a[1]);
-
-    // Show top 8 slowest and top 7 fastest for a diverging view
-    const top8 = entries.slice(0, 8);
-    const bottom7 = entries.slice(-7).reverse();
-    const selected = [...top8, ...bottom7];
-
-    const labels = selected.map(e => e[0].length > 28 ? e[0].slice(0, 26) + '…' : e[0]);
-    const values = selected.map(e => +e[1].toFixed(1));
-    const colors = values.map(v => {
-        if (v > 20) return C.red(0.75);
-        if (v > 10) return C.amber(0.7);
-        if (v > 0) return C.blue(0.55);
-        return C.green(0.7);
-    });
-
-    charts.cuisineDelay = new Chart(document.getElementById('cuisineDelayChart'), {
-        type: 'bar',
-        data: {
-            labels,
-            datasets: [{
-                label: 'Avg Delay (min)',
-                data: values,
-                backgroundColor: colors,
-                borderRadius: 6,
-                barPercentage: 0.6
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    ...getTooltip(),
-                    callbacks: {
-                        label: ctx => {
-                            const v = ctx.parsed.x;
-                            return v > 0 ? `+${v} min delay` : `${v} min (early)`;
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    title: { display: true, text: 'Avg Delay (min)', color: getTextColor() },
-                    grid: getGrid(),
-                    border: getBorder()
-                },
-                y: {
-                    grid: { display: false },
-                    border: getBorder(),
-                    ticks: { font: { size: 10 } }
-                }
-            }
-        }
-    });
-}
 
 // ================================================================
 //  CSV EXPORT
@@ -596,7 +369,6 @@ function renderAll() {
     renderRestaurants(rows);
     renderRestaurantTable(rows);
     renderCuisineChart(rows);
-    renderSentiment(rows);
     renderGeoStats(rows);
     renderDistDelay(rows);
     if (leafletMap) renderMapMarkers(rows);
@@ -609,10 +381,7 @@ const pageMap = {
     overview:    { title: 'Overview',          sub: 'KPIs & summary charts' },
     delivery:    { title: 'Delivery Analysis', sub: 'Delays, distance & traffic' },
     restaurants: { title: 'Restaurants',       sub: 'Rankings & performance' },
-    sentiment:   { title: 'Sentiment',         sub: 'Reviews & feedback' },
-    predict:     { title: 'Predict Delay',     sub: 'ML prediction engine' },
     heatmap:     { title: 'Delivery Heatmap',  sub: 'Geographic delivery map' },
-    insights:    { title: 'Insights & Alerts', sub: 'AI-generated analysis' },
 };
 
 function switchPage(page) {
@@ -633,8 +402,6 @@ function switchPage(page) {
     if (page === 'heatmap') {
         setTimeout(() => { initLeafletMap(); leafletMap?.invalidateSize(); }, 100);
     }
-    if (page === 'predict') renderCorrelationMatrix();
-    if (page === 'insights') { renderInsights(); renderCuisineDelayChart(); }
 }
 
 // ================================================================
@@ -691,7 +458,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('exportCSV').addEventListener('click', exportCSV);
 
     setupDarkMode();
-    setupPrediction();
     renderAll();
 
     // Welcome toast

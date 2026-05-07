@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DelaySense AI — Food Delivery Analytics</title>
-    <meta name="description" content="SaaS-grade food delivery delay analytics with ML predictions, heatmaps, and real-time filtering.">
+    <meta name="description" content="SaaS-grade food delivery delay analytics with heatmaps, and real-time filtering.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -44,24 +44,10 @@
                 <div class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
                 <div class="sb-item-text"><span class="sb-item-title">Restaurants</span><span class="sb-item-desc">Rankings & performance</span></div>
             </a>
-            <a href="#" class="sb-item" data-page="sentiment">
-                <div class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
-                <div class="sb-item-text"><span class="sb-item-title">Sentiment</span><span class="sb-item-desc">Reviews & feedback</span></div>
-            </a>
-            <a href="#" class="sb-item" data-page="predict">
-                <div class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/><path d="M12 6v6l4 2"/><path d="M2 12h2M20 12h2"/></svg></div>
-                <div class="sb-item-text"><span class="sb-item-title">Predict Delay</span><span class="sb-item-desc">ML prediction engine</span></div>
-                <span class="sb-badge">AI</span>
-            </a>
             <a href="#" class="sb-item" data-page="heatmap">
                 <div class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
                 <div class="sb-item-text"><span class="sb-item-title">Heatmap</span><span class="sb-item-desc">Geographic delivery map</span></div>
                 <span class="sb-badge new">NEW</span>
-            </a>
-            <a href="#" class="sb-item" data-page="insights">
-                <div class="sb-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-                <div class="sb-item-text"><span class="sb-item-title">Insights & Alerts</span><span class="sb-item-desc">AI-generated analysis</span></div>
-                <span class="sb-badge">AI</span>
             </a>
         </nav>
 
@@ -135,54 +121,6 @@
             </section>
         </main>
 
-        <!-- SENTIMENT -->
-        <main class="content page-content" id="page-sentiment">
-            <section class="grid-1-1">
-                <div class="card"><div class="card-header"><h2>Review Sentiment</h2><p>Customer review tone</p></div><div class="card-chart card-chart--sm"><canvas id="sentimentChart"></canvas></div></div>
-                <div class="card"><div class="card-header"><h2>Sentiment vs Delay</h2><p>How delays impact review tone</p></div><div class="card-chart"><canvas id="sentimentDelayChart"></canvas></div></div>
-            </section>
-        </main>
-
-        <!-- PREDICT (ML) -->
-        <main class="content page-content" id="page-predict">
-            <section class="grid-1-1">
-                <div class="card card--predict">
-                    <div class="card-header">
-                        <h2>🤖 Delay Prediction Engine</h2>
-                        <p>Enter order parameters to predict expected delivery delay</p>
-                    </div>
-                    <div class="predict-form">
-                        <div class="pf-row">
-                            <div class="pf-field"><label>Distance (km)</label><input type="range" id="predDist" min="1" max="15" value="5" step="0.5"><span class="pf-val" id="predDistVal">5.0 km</span></div>
-                            <div class="pf-field"><label>Prep Time (min)</label><input type="range" id="predPrep" min="10" max="45" value="25" step="1"><span class="pf-val" id="predPrepVal">25 min</span></div>
-                        </div>
-                        <div class="pf-row">
-                            <div class="pf-field"><label>Traffic Level</label><select id="predTraffic"><option value="Low">Low</option><option value="Medium" selected>Medium</option><option value="High">High</option><option value="Jam">Jam</option></select></div>
-                            <div class="pf-field"><label>Time of Day</label><select id="predTod"><option value="Morning">Morning</option><option value="Afternoon" selected>Afternoon</option><option value="Evening">Evening</option><option value="Night">Night</option></select></div>
-                        </div>
-                        <div class="pf-row">
-                            <div class="pf-field"><label>Order Hour</label><input type="range" id="predHour" min="8" max="23" value="14" step="1"><span class="pf-val" id="predHourVal">2:00 PM</span></div>
-                            <div class="pf-field"><label>Order Cost (₹)</label><input type="range" id="predCost" min="50" max="1000" value="250" step="10"><span class="pf-val" id="predCostVal">₹250</span></div>
-                        </div>
-                        <button class="predict-btn" id="runPredict">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                            Run Prediction
-                        </button>
-                    </div>
-                </div>
-                <div class="card card--result">
-                    <div class="card-header"><h2>Prediction Result</h2><p>ML model output</p></div>
-                    <div class="predict-result" id="predictResult">
-                        <div class="pr-placeholder">Configure parameters and click <strong>Run Prediction</strong></div>
-                    </div>
-                    <div class="model-meta" id="modelMeta"></div>
-                </div>
-            </section>
-            <section class="grid-full">
-                <div class="card"><div class="card-header"><h2>Correlation Matrix</h2><p>Feature-to-feature relationships</p></div><div class="card-chart card-chart--tall"><canvas id="corrChart"></canvas></div></div>
-            </section>
-        </main>
-
         <!-- HEATMAP -->
         <main class="content page-content" id="page-heatmap">
             <section class="grid-full">
@@ -197,21 +135,12 @@
             </section>
         </main>
 
-        <!-- INSIGHTS -->
-        <main class="content page-content" id="page-insights">
-            <section class="grid-full"><div class="insights-grid" id="insightsGrid"></div></section>
-            <section class="grid-full">
-                <div class="card"><div class="card-header"><h2>Cuisine Delay Ranking</h2><p>Average delay by cuisine type</p></div><div class="card-chart card-chart--tall"><canvas id="cuisineDelayChart"></canvas></div></div>
-            </section>
-        </main>
-
-        <footer class="main-footer"><p>DelaySense AI · Authentic Swiggy Dataset (1.9L Rows) · Star Schema · Python + ML + Chart.js + Leaflet</p></footer>
+        <footer class="main-footer"><p>DelaySense AI · Authentic Swiggy Dataset (1.9L Rows) · Star Schema · Python + Chart.js + Leaflet</p></footer>
     </div>
 
     <div class="toast-container" id="toastContainer"></div>
 
     <script src="data.js?v=2"></script>
-    <script src="ml_data.js?v=2"></script>
     <script src="app.js?v=2"></script>
 </body>
 </html>

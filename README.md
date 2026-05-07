@@ -8,7 +8,7 @@
 ![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-**An end-to-end data engineering & analytics pipeline that predicts food delivery delays, analyzes customer satisfaction, and provides actionable business insights through an interactive SaaS-grade dashboard.**
+**An end-to-end data engineering & analytics pipeline that analyzes food delivery delays and customer satisfaction, and provides actionable business insights through an interactive SaaS-grade dashboard.**
 
 [🚀 Live Dashboard](#live-demo) · [📖 Documentation](#architecture) · [⚙️ Setup](#getting-started)
 
@@ -32,13 +32,12 @@
 
 ## 🔍 Overview
 
-**DelaySense AI** is a comprehensive data analytics platform that tackles the critical problem of food delivery delays and their impact on customer satisfaction. The project implements a full **ETL → Star Schema → ML → Dashboard** pipeline:
+**DelaySense AI** is a comprehensive data analytics platform that tackles the critical problem of food delivery delays and their impact on customer satisfaction. The project implements a full **ETL → Star Schema → Dashboard** pipeline:
 
 1. **Extract** raw delivery & satisfaction data  
-2. **Transform** with cleaning, feature engineering, and sentiment analysis  
+2. **Transform** with cleaning, and feature engineering  
 3. **Model** into a Kimball-style star schema  
-4. **Predict** delivery delays using Random Forest ML  
-5. **Visualize** through an interactive, real-time dashboard  
+4. **Visualize** through an interactive, real-time dashboard  
 
 ---
 
@@ -46,14 +45,10 @@
 
 | Feature | Description |
 |---------|-------------|
-| 🔄 **ETL Pipeline** | Automated 8-step data processing pipeline |
+| 🔄 **ETL Pipeline** | Automated data processing pipeline |
 | ⭐ **Star Schema** | Kimball-methodology dimensional modeling (fact + dimension tables) |
-| 🤖 **ML Prediction** | Random Forest model for delivery delay prediction |
-| 💬 **Sentiment Analysis** | NLP-based customer review sentiment scoring |
 | 📊 **Interactive Dashboard** | SaaS-grade analytics dashboard with Chart.js |
 | 🗺️ **Delivery Heatmap** | Geographic visualization of delivery patterns |
-| 📈 **Correlation Matrix** | Statistical relationship analysis between variables |
-| 🔔 **AI Insights Engine** | Automated anomaly detection and business alerts |
 | 📥 **CSV Export** | One-click data export functionality |
 
 ---
@@ -64,24 +59,22 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                      DATA PIPELINE                               │
 │                                                                   │
-│  Raw Data → Clean → Feature Eng. → Star Schema → ML Model       │
-│     │          │          │              │            │            │
-│  step0     step2      step3          step4        step8          │
-│  download  clean      features       model        ml_predict     │
+│  Raw Data → Clean → Feature Eng. → Star Schema                    │
+│     │          │          │              │                        │
+│  step0     step2      step3          step4                        │
+│  download  clean      features       model                        │
 │                                                                   │
 ├─────────────────────────────────────────────────────────────────┤
 │                    ANALYTICS LAYER                                │
 │                                                                   │
-│  SQL Analysis (step5) ──→ Sentiment Analysis (step7)             │
-│         │                         │                               │
-│         └────────┬────────────────┘                               │
+│  SQL Analysis (step5)                                             │
+│         │                                                         │
+│         └────────┬────────────────────────────────────────────────┘
 │                  ▼                                                 │
 │         Dashboard (HTML/JS/CSS)                                   │
 │         ├── KPI Cards & Metrics                                   │
 │         ├── Interactive Charts                                    │
-│         ├── Delivery Heatmap                                      │
-│         ├── ML Prediction Engine                                  │
-│         └── AI Insights & Alerts                                  │
+│         └── Delivery Heatmap                                      │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -89,12 +82,10 @@
 
 ## 🛠️ Tech Stack
 
-- **Data Processing:** Python (Pandas, NumPy, Scikit-learn)
-- **NLP:** TextBlob for sentiment analysis
+- **Data Processing:** Python (Pandas, NumPy)
 - **Database:** SQLite with star schema modeling
 - **Visualization:** Chart.js, Leaflet.js (heatmaps)
 - **Frontend:** Vanilla HTML5, CSS3, JavaScript
-- **ML Model:** Random Forest Classifier/Regressor
 
 ---
 
@@ -106,8 +97,7 @@ DelaySense--AI/
 │   ├── index.html          # Main dashboard page
 │   ├── app.js              # Dashboard logic & chart rendering
 │   ├── styles.css          # Premium dark-theme styling
-│   ├── data.js             # Processed data for visualization
-│   └── ml_data.js          # ML model data & coefficients
+│   └── data.js             # Processed data for visualization
 │
 ├── 📂 scripts/             # Python data pipeline
 │   ├── step0_download.py   # Data acquisition
@@ -115,9 +105,7 @@ DelaySense--AI/
 │   ├── step2_clean.py      # Data cleaning & validation
 │   ├── step3_features.py   # Feature engineering
 │   ├── step4_model.py      # Star schema modeling
-│   ├── step5_analysis.py   # SQL-based analysis
-│   ├── step7_sentiment.py  # NLP sentiment analysis
-│   └── step8_ml_prediction.py # ML model training
+│   └── step5_analysis.py   # SQL-based analysis
 │
 ├── 📂 data/                # Data files
 │   ├── raw/                # Original datasets
@@ -144,8 +132,8 @@ DelaySense--AI/
 
 ```bash
 # Clone the repository
-git clone https://github.com/Mahi044/DelaySense--AI.git
-cd DelaySense--AI
+git clone https://github.com/Mahi044/Delaysense.git
+cd Delaysense
 
 # Install dependencies
 pip install -r requirements.txt
@@ -161,8 +149,6 @@ python scripts/step2_clean.py
 python scripts/step3_features.py
 python scripts/step4_model.py
 python scripts/step5_analysis.py
-python scripts/step7_sentiment.py
-python scripts/step8_ml_prediction.py
 ```
 
 ### Launch Dashboard
@@ -178,9 +164,6 @@ The dashboard provides a **SaaS-grade analytics experience** with:
 - **KPI Cards** — Real-time delivery metrics & satisfaction scores
 - **Interactive Charts** — Delay distribution, restaurant performance, time analysis
 - **Delivery Heatmap** — Geographic visualization of delivery patterns
-- **ML Prediction Panel** — Predict delivery delays based on input parameters
-- **Correlation Matrix** — Statistical relationships between key variables
-- **AI Insights** — Automated anomaly detection and business recommendations
 - **CSV Export** — Download filtered data for offline analysis
 
 ---
@@ -188,7 +171,7 @@ The dashboard provides a **SaaS-grade analytics experience** with:
 ## 🌐 Live Demo
 
 The dashboard is deployed via **GitHub Pages**:  
-🔗 **[https://mahi044.github.io/DelaySense--AI/dashboard/](https://mahi044.github.io/DelaySense--AI/dashboard/)**
+🔗 **[https://mahi044.github.io/Delaysense/dashboard/](https://mahi044.github.io/Delaysense/dashboard/)**
 
 ---
 
