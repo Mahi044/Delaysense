@@ -166,7 +166,7 @@ def run_analysis(conn):
                     "SELECT delivery_delay, rating FROM fact_orders", conn
                 )
                 corr = corr_df["delivery_delay"].corr(corr_df["rating"])
-                print(f"\n  📊 Pearson Correlation (delay vs rating): {corr:.4f}")
+                print(f"\n  > Pearson Correlation (delay vs rating): {corr:.4f}")
                 if abs(corr) < 0.1:
                     print("     → Weak/No linear correlation")
                 elif abs(corr) < 0.3:
@@ -177,7 +177,7 @@ def run_analysis(conn):
                     print("     → Strong negative correlation")
 
         except Exception as e:
-            print(f"  ✗ Error: {e}")
+            print(f"  [x] Error: {e}")
 
     return results
 

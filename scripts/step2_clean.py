@@ -34,6 +34,10 @@ def clean_swiggy(df):
         "Rating Count": "rating_count"
     })
     
+    # Normalize strings to remove duplicates (e.g. '7Th Heaven' vs '7th Heaven')
+    df["restaurant_name"] = df["restaurant_name"].str.strip().str.title()
+    df["cuisine_type"] = df["cuisine_type"].str.strip().str.title()
+    
     # Fill any missing cuisines with 'General'
     df["cuisine_type"] = df["cuisine_type"].fillna("General")
     
